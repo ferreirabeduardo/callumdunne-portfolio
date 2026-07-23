@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Get in touch with Callum Dunne for digital marketing, brand strategy, and content projects." />
+  <title>Contact — Callum Dunne</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">CD</span>
+        <span>Callum Dunne</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="contact.html" class="active">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="section-center">
+        <p class="eyebrow">Contact</p>
+        <h2>Let's start a conversation.</h2>
+        <p>
+          Have a project in mind? Looking for marketing support? Drop me a message and I'll get back to you within 24 hours.
+        </p>
+
+        <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+          <input type="text" name="name" placeholder="Your name" required />
+          <input type="email" name="email" placeholder="Your email" required />
+          <input type="text" name="subject" placeholder="Subject" />
+          <textarea name="message" placeholder="Tell me about your project..." required></textarea>
+          <button type="submit" class="button button-primary" style="border:none;cursor:pointer;font-size:1rem;">Send message</button>
+        </form>
+
+        <div class="contact-info">
+          <a href="mailto:hello@callumdunne.com">
+            <span>✉️</span> hello@callumdunne.com
+          </a>
+          <a href="https://linkedin.com/in/callumdunne" target="_blank" rel="noreferrer">
+            <span>💼</span> LinkedIn
+          </a>
+          <a href="https://instagram.com/callumdunne" target="_blank" rel="noreferrer">
+            <span>📷</span> Instagram
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    &copy; <span id="year"></span> Callum Dunne. All rights reserved.
+  </footer>
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>
