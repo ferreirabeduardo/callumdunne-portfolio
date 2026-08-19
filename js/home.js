@@ -8,7 +8,8 @@ const updateTime = () => {
 };
 updateTime();
 setInterval(updateTime, 30000);
-document.getElementById('year').textContent = new Date().getFullYear();
+const yearElement = document.getElementById('year');
+if (yearElement) yearElement.textContent = new Date().getFullYear();
 
 const menuButton = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('.home-nav');
@@ -100,5 +101,5 @@ document.querySelectorAll('.contact-open').forEach(button => button.addEventList
 closeButton?.addEventListener('click', closeContact);
 scrim?.addEventListener('click', closeContact);
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape' && drawer.classList.contains('is-open')) closeContact();
+  if (event.key === 'Escape' && drawer?.classList.contains('is-open')) closeContact();
 });
