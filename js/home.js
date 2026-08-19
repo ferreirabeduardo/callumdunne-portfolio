@@ -40,15 +40,17 @@ if (reducedMotion) {
 
 const preview = document.querySelector('.project-preview');
 const projectColors = {
-  staycity: ['#f2a65a', '#5b4a8b'],
-  kerrygold: ['#f5c84c', '#0a5f3c'],
-  'burger-king': ['#ed6a3a', '#7c1f2b'],
-  bmw: ['#58a5d8', '#152330']
+  'bagel-bar': ['#f1cf59', '#1d6a42'],
+  'share-the-magic': ['#3f7c68', '#d8ef78'],
+  'bag-uette': ['#e9b840', '#d66d3f'],
+  'tourism-ni': ['#66a4ad', '#1f4f59'],
+  'cult-to-culture': ['#f1cf59', '#ce4f78']
 };
 document.querySelectorAll('.project-row').forEach(row => {
   row.addEventListener('pointerenter', () => {
     if (!preview) return;
     const colors = projectColors[row.dataset.project];
+    if (!colors) return;
     preview.style.setProperty('--preview-one', colors[0]);
     preview.style.setProperty('--preview-two', colors[1]);
     preview.querySelector('span').textContent = `${row.querySelector('.project-name').textContent} image`;
@@ -61,6 +63,28 @@ document.querySelectorAll('.project-row').forEach(row => {
   });
   row.addEventListener('pointerleave', () => preview?.classList.remove('is-active'));
 });
+
+const showLinkedCampaign = ({ fromPageLoad = false } = {}) => {
+  if (!document.body.classList.contains('portfolio-v2') || !window.location.hash) return;
+  const target = document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
+  if (!target) return;
+  target.querySelector('.case-topline')?.classList.add('is-visible');
+  const moveToTarget = () => {
+    target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+    target.classList.remove('is-linked');
+    void target.offsetWidth;
+    target.classList.add('is-linked');
+    window.setTimeout(() => target.classList.remove('is-linked'), 1400);
+  };
+  if (fromPageLoad && !reducedMotion) {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    requestAnimationFrame(() => requestAnimationFrame(moveToTarget));
+  } else {
+    moveToTarget();
+  }
+};
+window.addEventListener('hashchange', () => showLinkedCampaign());
+window.addEventListener('load', () => showLinkedCampaign({ fromPageLoad: true }), { once: true });
 
 if (!reducedMotion) {
   document.querySelectorAll('.tilt-card').forEach(card => {
