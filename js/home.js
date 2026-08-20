@@ -1,10 +1,11 @@
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const timeElement = document.querySelector('.live-time');
+const timeElements = document.querySelectorAll('.live-time');
 const updateTime = () => {
-  if (!timeElement) return;
-  timeElement.textContent = new Intl.DateTimeFormat('en-IE', {
+  if (!timeElements.length) return;
+  const currentTime = new Intl.DateTimeFormat('en-IE', {
     hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Europe/Dublin'
   }).format(new Date());
+  timeElements.forEach(element => { element.textContent = currentTime; });
 };
 updateTime();
 setInterval(updateTime, 30000);
@@ -23,6 +24,66 @@ navigation?.querySelectorAll('a').forEach(link => link.addEventListener('click',
   navigation.classList.remove('is-open');
 }));
 
+const marquee = document.querySelector('.image-marquee');
+const marqueeTrack = marquee?.querySelector('.marquee-track');
+if (marquee && marqueeTrack) {
+  let marqueePosition = 0;
+  let dragStartX = 0;
+  let dragStartPosition = 0;
+  let isDragging = false;
+  let resumeAt = 0;
+  let previousFrameTime = performance.now();
+
+  const cycleWidth = () => marqueeTrack.scrollWidth / 2;
+  const renderMarquee = () => {
+    const width = cycleWidth();
+    if (!width) return;
+    marquee.scrollLeft = ((marqueePosition % width) + width) % width;
+  };
+  const pauseBriefly = (duration = 700) => { resumeAt = performance.now() + duration; };
+
+  marquee.addEventListener('pointerdown', event => {
+    isDragging = true;
+    dragStartX = event.clientX;
+    dragStartPosition = marqueePosition;
+    marquee.classList.add('is-dragging');
+    marquee.setPointerCapture(event.pointerId);
+  });
+  marquee.addEventListener('pointermove', event => {
+    if (!isDragging) return;
+    marqueePosition = dragStartPosition - (event.clientX - dragStartX);
+    renderMarquee();
+  });
+  const finishDrag = event => {
+    if (!isDragging) return;
+    isDragging = false;
+    marquee.classList.remove('is-dragging');
+    if (marquee.hasPointerCapture(event.pointerId)) marquee.releasePointerCapture(event.pointerId);
+    pauseBriefly();
+  };
+  marquee.addEventListener('pointerup', finishDrag);
+  marquee.addEventListener('pointercancel', finishDrag);
+  marquee.addEventListener('keydown', event => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    event.preventDefault();
+    marqueePosition += event.key === 'ArrowRight' ? 120 : -120;
+    renderMarquee();
+    pauseBriefly(1200);
+  });
+
+  const moveMarquee = frameTime => {
+    const elapsed = Math.min(frameTime - previousFrameTime, 50);
+    previousFrameTime = frameTime;
+    if (!reducedMotion && !isDragging && frameTime >= resumeAt) {
+      marqueePosition += elapsed * cycleWidth() / 34000;
+      renderMarquee();
+    }
+    requestAnimationFrame(moveMarquee);
+  };
+  requestAnimationFrame(moveMarquee);
+  window.addEventListener('resize', renderMarquee);
+}
+
 const reveals = document.querySelectorAll('.reveal');
 if (reducedMotion) {
   reveals.forEach(element => element.classList.add('is-visible'));
@@ -37,32 +98,6 @@ if (reducedMotion) {
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
   reveals.forEach(element => observer.observe(element));
 }
-
-const preview = document.querySelector('.project-preview');
-const projectColors = {
-  'bagel-bar': ['#f1cf59', '#1d6a42'],
-  'share-the-magic': ['#3f7c68', '#d8ef78'],
-  'bag-uette': ['#e9b840', '#d66d3f'],
-  'tourism-ni': ['#66a4ad', '#1f4f59'],
-  'cult-to-culture': ['#f1cf59', '#ce4f78']
-};
-document.querySelectorAll('.project-row').forEach(row => {
-  row.addEventListener('pointerenter', () => {
-    if (!preview) return;
-    const colors = projectColors[row.dataset.project];
-    if (!colors) return;
-    preview.style.setProperty('--preview-one', colors[0]);
-    preview.style.setProperty('--preview-two', colors[1]);
-    preview.querySelector('span').textContent = `${row.querySelector('.project-name').textContent} image`;
-    preview.classList.add('is-active');
-  });
-  row.addEventListener('pointermove', event => {
-    if (!preview || window.innerWidth < 900) return;
-    preview.style.left = `${Math.min(event.clientX + 34, window.innerWidth - 360)}px`;
-    preview.style.top = `${Math.min(event.clientY + 28, window.innerHeight - 250)}px`;
-  });
-  row.addEventListener('pointerleave', () => preview?.classList.remove('is-active'));
-});
 
 const showLinkedCampaign = ({ fromPageLoad = false } = {}) => {
   if (!document.body.classList.contains('portfolio-v2') || !window.location.hash) return;
