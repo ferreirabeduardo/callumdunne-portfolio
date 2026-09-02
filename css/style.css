@@ -215,6 +215,10 @@
 .case-visual > span { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
 .case-visual strong { position: relative; z-index: 1; max-width: 1050px; font-size: clamp(52px, 8.2vw, 138px); line-height: .8; letter-spacing: -.08em; overflow-wrap: anywhere; }
 .case-visual::after { content: ''; position: absolute; width: 44%; aspect-ratio: 1; align-self: center; border: 1px solid rgba(255,255,255,.7); border-radius: 50%; }
+.case-visual-media-wrap { position: relative; padding: 0; background: #171315; }
+.case-visual-media-wrap::after { display: none; }
+.case-visual-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.case-bagel .case-visual-media { object-position: 50% 58%; }
 .case-bagel .case-visual { background: linear-gradient(140deg, #f1cf59, #1d6a42); color: #123f29; }
 .case-share .case-visual { background: linear-gradient(145deg, #3f7c68, #d8ef78); color: #142a21; }
 .case-baguette .case-visual { background: linear-gradient(145deg, #e9b840, #d66d3f); color: #34200d; }
