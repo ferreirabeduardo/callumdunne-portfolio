@@ -12,6 +12,14 @@ setInterval(updateTime, 30000);
 const yearElement = document.getElementById('year');
 if (yearElement) yearElement.textContent = new Date().getFullYear();
 
+// Local file previews do not resolve directory URLs to their index pages.
+if (window.location.protocol === 'file:') {
+  document.querySelectorAll('a[href$="/"]').forEach(link => {
+    const href = link.getAttribute('href');
+    if (href && !href.startsWith('//')) link.setAttribute('href', `${href}index.html`);
+  });
+}
+
 const menuButton = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('.home-nav');
 menuButton?.addEventListener('click', () => {
