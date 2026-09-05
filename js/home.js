@@ -12,6 +12,12 @@ setInterval(updateTime, 30000);
 const yearElement = document.getElementById('year');
 if (yearElement) yearElement.textContent = new Date().getFullYear();
 
+document.querySelectorAll('.floating-contact').forEach(control => {
+  control.setAttribute('aria-label', 'Contact');
+  control.querySelector('.contact-orb')?.setAttribute('aria-hidden', 'true');
+  control.querySelector('.contact-label')?.setAttribute('aria-hidden', 'true');
+});
+
 // Local file previews do not resolve directory URLs to their index pages.
 if (window.location.protocol === 'file:') {
   document.querySelectorAll('a[href$="/"]').forEach(link => {
@@ -106,6 +112,58 @@ if (reducedMotion) {
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
   reveals.forEach(element => observer.observe(element));
 }
+
+const scrollAutoplayFrames = document.querySelectorAll('[data-autoplay-src]');
+if (scrollAutoplayFrames.length && !reducedMotion) {
+  const videoObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting || !entry.target.dataset.autoplaySrc) return;
+      const autoplayUrl = new URL(entry.target.dataset.autoplaySrc);
+      entry.target.src = autoplayUrl.toString();
+      delete entry.target.dataset.autoplaySrc;
+      videoObserver.unobserve(entry.target);
+    });
+  }, { threshold: 0.45 });
+
+  scrollAutoplayFrames.forEach(frame => videoObserver.observe(frame));
+}
+
+const nativeAutoplayVideos = document.querySelectorAll('.case-native-autoplay');
+if (nativeAutoplayVideos.length && !reducedMotion) {
+  const nativeVideoObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.play().catch(() => {});
+      else entry.target.pause();
+    });
+  }, { threshold: 0.45 });
+
+  nativeAutoplayVideos.forEach(video => nativeVideoObserver.observe(video));
+}
+
+const filmSoundButtons = document.querySelectorAll('.case-film-sound');
+const updateFilmSoundButton = (button, video) => {
+  const mediaName = button.closest('.reaction-video') ? 'reaction video' : 'campaign film';
+  button.setAttribute('aria-pressed', String(!video.muted));
+  button.setAttribute('aria-label', video.muted ? `Unmute ${mediaName}` : `Mute ${mediaName}`);
+  button.querySelector('span').textContent = video.muted ? 'Sound off' : 'Sound on';
+};
+
+filmSoundButtons.forEach(button => {
+  const video = button.closest('.case-film, .reaction-video')?.querySelector('video');
+  if (!video) return;
+  button.addEventListener('click', () => {
+    if (video.muted) {
+      filmSoundButtons.forEach(otherButton => {
+        const otherVideo = otherButton.closest('.case-film, .reaction-video')?.querySelector('video');
+        if (!otherVideo || otherVideo === video) return;
+        otherVideo.muted = true;
+        updateFilmSoundButton(otherButton, otherVideo);
+      });
+    }
+    video.muted = !video.muted;
+    updateFilmSoundButton(button, video);
+  });
+});
 
 const showLinkedCampaign = ({ fromPageLoad = false } = {}) => {
   if (!document.body.classList.contains('portfolio-v2') || !window.location.hash) return;
